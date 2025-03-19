@@ -27,12 +27,15 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+        .table-container {
+            max-height: 250px; 
+            overflow-y: auto; 
+            border: 1px solid #ddd;
+            border-radius: 10px;
+        }
         table {
             width: 100%;
-            margin-top: 20px;
             border-collapse: collapse;
-            overflow: hidden;
-            border-radius: 10px;
         }
         th, td {
             padding: 12px;
@@ -42,6 +45,9 @@
         th {
             background-color: #007BFF;
             color: white;
+            position: sticky;
+            top: 0;
+            z-index: 2;
         }
         tr:nth-child(even) {
             background-color: #f2f2f2;
@@ -79,20 +85,26 @@
         {% endif %}
 
         <h2>Lista de Libros</h2>
-        <table>
-            <tr>
-                <th>Título</th>
-                <th>Autor</th>
-                <th>Año</th>
-            </tr>
-            {% for book in sorted_books %}
-            <tr>
-                <td>{{ book.0 }}</td>
-                <td>{{ book.1 }}</td>
-                <td>{{ book.2 }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Autor</th>
+                        <th>Año</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in sorted_books %}
+                    <tr>
+                        <td>{{ book.0 }}</td>
+                        <td>{{ book.1 }}</td>
+                        <td>{{ book.2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <a href="/" class="btn">Volver al inicio</a>
     </div>
