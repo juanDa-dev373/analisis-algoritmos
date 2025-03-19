@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libros Ordenados</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            text-align: center;
+            margin: 20px;
+        }
+        h1 {
+            color: #007BFF;
+        }
+        h2 {
+            color: #555;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 18px;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Libros Ordenados con {{ method|capfirst }} Sort</h1>
+
+        {% if image_url %}
+            <h2>Distribución de Libros por Año</h2>
+            <img src="{{ image_url }}" alt="Gráfica de libros ordenados">
+        {% endif %}
+
+        <h2>Lista de Libros</h2>
+        <table>
+            <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Año</th>
+            </tr>
+            {% for book in sorted_books %}
+            <tr>
+                <td>{{ book.0 }}</td>
+                <td>{{ book.1 }}</td>
+                <td>{{ book.2 }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <a href="/" class="btn">Volver al inicio</a>
+    </div>
+
+</body>
+</html>
