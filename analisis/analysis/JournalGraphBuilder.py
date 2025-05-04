@@ -1,116 +1,139 @@
 import os
 import re
-import random
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
-import seaborn as sns
-from tqdm import tqdm
 from colorama import Style, init, Fore
+from collections import defaultdict
+from wordcloud import WordCloud
+import community as community_louvain
 
 init(autoreset=True)
 
 class JournalGraphBuilder:
-    def __init__(self, data_path: str, output_path: str):
+    def __init__(self, data_path: str, category_path: str, output_path: str):
         self.data_path = data_path
+        self.category_path = category_path
         self.output_path = output_path
+        self.df = pd.DataFrame()
+        self.categorias = {}
+        self.frecuencias_categoria = {}
         self.graph = nx.Graph()
-        self.top_journals = []
-        self.journal_articles = {}
-        self.journal_colors = sns.color_palette("Set2", n_colors=10)
-        self.article_colors = sns.color_palette("Paired", n_colors=8)
 
     def run(self):
         self._print_title()
-        df = self._load_and_prepare_data()
-        self._extract_top_journals(df)
-        self._build_article_dict(df)
-        self._build_graph()
+        self.df = self._load_and_prepare_data()
+        self.categorias = self._load_categories_from_txt()
+        self._compute_frequencies()
+        self._build_co_word_graph()
+        self._generate_wordclouds()
         self._draw_and_save_graph()
         self._print_success()
 
     def _print_title(self):
         print("\n" + Style.BRIGHT + Fore.CYAN + "=" * 60)
-        print(Fore.YELLOW + Style.BRIGHT + "  ***   Análisis de Journals y Artículos Más Citados   ***")
+        print(Fore.YELLOW + Style.BRIGHT + "  ***   Análisis de Categorías desde Abstracts   ***")
         print(Fore.CYAN + "=" * 60 + "\n")
 
     def _load_and_prepare_data(self) -> pd.DataFrame:
         df = pd.read_csv(self.data_path)
-        if 'Article Citation Count' not in df.columns:
-            df['Article Citation Count'] = [random.randint(0, 250) for _ in range(len(df))]
-        else:
-            df['Article Citation Count'].fillna(random.randint(0, 250), inplace=True)
-
-        df['Journal'] = df['Publication Title'].fillna(df['ISSN'])
-        df['Journal'] = df['Journal'].apply(self._clean_journal_name)
+        df['Abstract'] = df['Abstract'].fillna('').str.lower()
         return df
 
-    @staticmethod
-    def _clean_journal_name(journal_name: str) -> str:
-        return re.sub(r"[\-,\(\),].*", "", journal_name).strip()
+    def _load_categories_from_txt(self) -> dict:
+        categorias = {}
+        with open(self.category_path, 'r', encoding='utf-8') as file:
+            lines = [line.strip() for line in file if line.strip()]
+        categoria_actual = None
+        for line in lines:
+            if line in {"Habilidades", "Conceptos Computationales", "Actitudes", "Propiedades psicométricas", "Herramienta de evaluación",
+            "Diseño de investigación", "Nivel de escolaridad", "Medio", "Estrategia", "Herramienta"}:
+                categoria_actual = line
+                categorias[categoria_actual] = []
+            else:
+                categorias[categoria_actual].append(line.lower())
+        return categorias
 
-    def _extract_top_journals(self, df: pd.DataFrame):
-        self.top_journals = df['Journal'].value_counts().nlargest(10).index.tolist()
+    def _compute_frequencies(self):
+        for categoria, variables in self.categorias.items():
+            frecuencias = defaultdict(int)
+            for var in variables:
+                sinónimos = var.split('-')
+                for abstract in self.df['Abstract']:
+                    if any(re.search(rf'\b{re.escape(s)}\b', abstract) for s in sinónimos):
+                        frecuencias[var] += sum(abstract.count(s) for s in sinónimos)
+            self.frecuencias_categoria[categoria] = dict(frecuencias)
 
-    def _build_article_dict(self, df: pd.DataFrame):
-        for journal in tqdm(self.top_journals, desc="Filtrando artículos de los 10 journals principales"):
-            articles = df[df['Journal'] == journal].nlargest(8, 'Article Citation Count')
-            self.journal_articles[journal] = articles
+    def _generate_wordclouds(self):
+        os.makedirs(self.output_path+"/word-clouds", exist_ok=True)
+        for categoria, freqs in self.frecuencias_categoria.items():
+            if freqs:
+                wc = WordCloud(width=800, height=400).generate_from_frequencies(freqs)
+                plt.figure()
+                plt.title(f'Nube de Palabras - {categoria}')
+                plt.imshow(wc, interpolation='bilinear')
+                plt.axis('off')
+                plt.tight_layout()
+                plt.savefig(os.path.join(self.output_path+"/word-clouds", f'wordcloud_{categoria}.png'))
+                plt.close()
 
-    def _build_graph(self):
-        for journal, articles in tqdm(self.journal_articles.items(), desc="Construyendo grafo de journals y artículos"):
-            color_journal = self.journal_colors[self.top_journals.index(journal)]
-            self.graph.add_node(journal, label='Journal', color=color_journal, size=4000)
-
-            for idx, article in articles.iterrows():
-                title = article['Title']
-                country = article['Country']
-                citations = article['Article Citation Count']
-                color_article = self.article_colors[idx % len(self.article_colors)]
-
-                self.graph.add_node(title, label=f"{country} ({citations} citas)", color=color_article, size=800 + citations * 4)
-                self.graph.add_edge(journal, title, weight=1 + citations / 50)
+    def _build_co_word_graph(self):
+        self.graph = nx.Graph()
+        for abstract in self.df['Abstract']:
+            presentes = []
+            for variables in self.categorias.values():
+                for var in variables:
+                    sinónimos = var.split('-')
+                    if any(s in abstract for s in sinónimos):
+                        presentes.append(var)
+            for i in range(len(presentes)):
+                for j in range(i + 1, len(presentes)):
+                    if self.graph.has_edge(presentes[i], presentes[j]):
+                        self.graph[presentes[i]][presentes[j]]['weight'] += 1
+                    else:
+                        self.graph.add_edge(presentes[i], presentes[j], weight=1)
 
     def _draw_and_save_graph(self):
-        os.makedirs(self.output_path, exist_ok=True)
+        if not self.graph:
+            print("No se generó ningún grafo de co-ocurrencia.")
+            return
 
-        node_colors = [self.graph.nodes[node]['color'] for node in self.graph]
-        node_sizes = [self.graph.nodes[node]['size'] for node in self.graph]
-        edge_weights = [self.graph[u][v]['weight'] for u, v in self.graph.edges()]
+        os.makedirs(self.output_path+"/graph", exist_ok=True)
+
+        # Detección de comunidades con Louvain
+        partition = community_louvain.best_partition(self.graph)
+
+        # Posiciones con layout forzado
+        pos = nx.spring_layout(self.graph, k=0.35, seed=42)
+
+        # Colores y tamaños
+        cmap = plt.get_cmap('tab20')
+        node_colors = [cmap(partition[node]) for node in self.graph.nodes()]
+        node_sizes = [300 + 40 * self.graph.degree(node) for node in self.graph.nodes()]
+        edge_widths = [0.5 + self.graph[u][v]['weight'] * 0.2 for u, v in self.graph.edges()]
 
         plt.figure(figsize=(22, 18))
-        pos = nx.spring_layout(self.graph, k=0.6, seed=42)
+        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors='black')
+        nx.draw_networkx_edges(self.graph, pos, width=edge_widths, alpha=0.4)
+        nx.draw_networkx_labels(self.graph, pos, font_size=10, font_family='sans-serif')
 
-        nx.draw_networkx_nodes(self.graph, pos, node_color=node_colors, node_size=node_sizes,
-                               edgecolors='k', linewidths=0.8, alpha=0.85)
-        nx.draw_networkx_edges(self.graph, pos, width=edge_weights, edge_color='gray', alpha=0.4)
-
-        journal_labels = {n: n for n in self.graph if self.graph.nodes[n]['label'] == 'Journal'}
-        article_labels = {n: self.graph.nodes[n]['label'] for n in self.graph if self.graph.nodes[n]['label'] != 'Journal'}
-
-        nx.draw_networkx_labels(self.graph, pos, journal_labels, font_size=13, font_color='navy', font_weight='bold')
-        for node, label in article_labels.items():
-            x, y = pos[node]
-            plt.text(x, y, label, fontsize=10, color='darkgreen', ha='center', va='center', alpha=0.8)
-
-        plt.title('Relación entre Journals y sus Artículos Más Citados', fontsize=18, color='indigo', fontweight='bold')
+        plt.title("Co-Word Network Visualization (Louvain Communities)", fontsize=18, fontweight='bold')
         plt.axis('off')
-
-        output_file = os.path.join(self.output_path, 'journal_article_graph.png')
-        plt.savefig(output_file, format='png', bbox_inches='tight', dpi=300)
-        plt.show()
-
-        self.output_file = output_file
+        plt.tight_layout()
+        output_file = os.path.join(self.output_path, "graph", "co_word_graph.png")
+        plt.savefig(output_file, dpi=300)
+        plt.close()
+        print(f"Grafo guardado en: {output_file}")
 
     def _print_success(self):
         print(Fore.GREEN + Style.BRIGHT + "=" * 60)
-        print(Fore.GREEN + f"Grafo guardado como imagen en: {self.output_file}")
+        print(Fore.GREEN + f"Análisis completado. Archivos guardados en: {self.output_path}")
         print(Fore.GREEN + "=" * 60)
-
 
 if __name__ == "__main__":
     builder = JournalGraphBuilder(
-        data_path='DataFinal/combined_datafinal.csv',
-        output_path='requerimiento5/statistics'
+        data_path= os.path.join(os.path.dirname(__file__), "../static/assets/Data_Final/datafinalbib.csv"),
+        category_path= os.path.join(os.path.dirname(__file__), "../static/assets/Category_txt/categories.txt"),
+        output_path='../static/assets/statistics'
     )
     builder.run()
