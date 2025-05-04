@@ -1,7 +1,7 @@
-from .Sort_Algorithm import SortAlgorithm
+from .SortAlgorithm import SortAlgorithm
 
-class CombSort:
-    def sort(self, data, column_index=2):
+class CombSort(SortAlgorithm):
+    def sort(self, data, column_index=0):
         if not data:
             return data
 
@@ -18,7 +18,7 @@ class CombSort:
             sorted_flag = True
 
             for i in range(n - gap):
-                if data[i][column_index] > data[i + gap][column_index]:
+                if self._safe_compare(data[i][column_index], data[i + gap][column_index]):
                     data[i], data[i + gap] = data[i + gap], data[i]
                     sorted_flag = False
 

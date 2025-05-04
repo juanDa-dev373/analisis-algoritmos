@@ -1,13 +1,14 @@
 from tqdm import tqdm
-from .Sort_Algorithm import SortAlgorithm
+from .SortAlgorithm import SortAlgorithm
 
 
 # Función para implementar TimSort
-class TimeSort(SortAlgorithm):
+class TimSort(SortAlgorithm):
     def __init__(self, min_run=32):
         self.min_run = min_run
 
-    def sort(self, array):
+    def sort(self, array, column_index=0):
+        self.column_index = column_index
         self._insertion_sort_chunks(array)
         self._merge_chunks(array)
         return array
@@ -23,7 +24,8 @@ class TimeSort(SortAlgorithm):
         for i in range(left + 1, right + 1):
             key_item = array[i]
             j = i - 1
-            while j >= left and array[j][2] > key_item[2]:
+
+            while j >= left and self._safe_compare(array[j][self.column_index], key_item[self.column_index]):
                 array[j + 1] = array[j]
                 j -= 1
             array[j + 1] = key_item
@@ -47,7 +49,7 @@ class TimeSort(SortAlgorithm):
         left_index, right_index, sorted_index = 0, 0, left
 
         while left_index < len(left_part) and right_index < len(right_part):
-            if left_part[left_index][2] <= right_part[right_index][2]:
+            if not self._safe_compare(left_part[left_index][self.column_index], right_part[right_index][self.column_index]):
                 array[sorted_index] = left_part[left_index]
                 left_index += 1
             else:

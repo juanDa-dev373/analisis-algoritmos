@@ -1,6 +1,7 @@
 import pandas as pd
 from colorama import Fore, Style
 import matplotlib
+from tabulate import tabulate
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
@@ -37,7 +38,7 @@ class SortingAnalyzer:
 
         start_time = time.time()
         tqdm.write(Fore.CYAN + "Ordenando..." + Style.RESET_ALL)
-
+        
         sorted_data = self.sorting_algorithm.sort(dataset.copy(), param_ex)
 
         execution_time = time.time() - start_time
@@ -45,6 +46,22 @@ class SortingAnalyzer:
         self._save_results(sorted_data, dataset_size)
         self._log_execution_time(dataset_size, execution_time)
 
+    def analyzeAll(self, dataset, dataset_size, list_sort):
+        """Ejecuta el ordenamiento y mide el rendimiento."""
+    
+        for name_sort, method in list_sort.items():
+            start_time = time.time()
+            tqdm.write(Fore.CYAN + f"Ordenando con {name_sort}..." + Style.RESET_ALL)
+
+            sorted_data = method().sort(dataset.copy(), 1)
+
+            execution_time = time.time() - start_time
+
+            # Imprimir la tabla con tabulate
+            print(Fore.YELLOW + "\nTabla de Frecuencias de Términos: " + name_sort + Style.RESET_ALL)
+            print(tabulate(list(sorted_data), headers=["Término", "Frecuencia"], tablefmt="grid"))
+            
+            self._log_execution_time(dataset_size, execution_time)
 
     def _display_title(self, description, dataset_size):
         print("\n" + Style.BRIGHT + Fore.CYAN + "=" * 60)
@@ -54,7 +71,7 @@ class SortingAnalyzer:
 
     def _save_results(self, sorted_data, dataset_size):
         output_csv_path = f'{self.output_directory}/{self.name_file}_Ord_fechaPub_{dataset_size}.csv'
-        pd.DataFrame(sorted_data, columns=['Title', 'Autor', 'Year']).to_csv(output_csv_path, index=False)
+        pd.DataFrame(sorted_data).to_csv(output_csv_path, index=False)
         print(Fore.BLUE + f'Archivo CSV guardado en: {output_csv_path}' + Style.RESET_ALL)
 
     def _log_execution_time(self, dataset_size, execution_time):

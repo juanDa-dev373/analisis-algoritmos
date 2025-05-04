@@ -29,24 +29,24 @@ class WebDriverConfig:
         # Inicializar el WebDriver
         self.driver = webdriver.Chrome(service=self.service, options=self.options)
 
-    def __init__(self, opcion):
-        PATH_DRIVER = 'C:/Users/david/Desktop/UNI/Programas/chromedriver-win64/chromedriver.exe'
-        self.options= opcion
-        self.options = webdriver.ChromeOptions()
-        self.options.add_argument('--start-maximized')
-        self.options.add_argument('--disable-extensions')
-        self.options.add_argument('--disable-features=CookiesWithoutSameSiteMustBeSecure')
-        self.options.add_argument("--allow-running-insecure-content")  # Permite contenido inseguro
-        self.options.add_argument("--ignore-certificate-errors")  # Ignora errores de certificados
-        self.options.add_argument("--disable-blink-features=AutomationControlled")  
-        self.options.add_argument("--incognito")
-        self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        self.options.add_experimental_option("useAutomationExtension", False)
-        # Definir el servicio con el path correcto
-        self.service = Service(PATH_DRIVER)
+    # def __init__(self, opcion):
+    #     PATH_DRIVER = 'C:/Users/david/Desktop/UNI/Programas/chromedriver-win64/chromedriver.exe'
+    #     self.options= opcion
+    #     self.options = webdriver.ChromeOptions()
+    #     self.options.add_argument('--start-maximized')
+    #     self.options.add_argument('--disable-extensions')
+    #     self.options.add_argument('--disable-features=CookiesWithoutSameSiteMustBeSecure')
+    #     self.options.add_argument("--allow-running-insecure-content")  # Permite contenido inseguro
+    #     self.options.add_argument("--ignore-certificate-errors")  # Ignora errores de certificados
+    #     self.options.add_argument("--disable-blink-features=AutomationControlled")  
+    #     self.options.add_argument("--incognito")
+    #     self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    #     self.options.add_experimental_option("useAutomationExtension", False)
+    #     # Definir el servicio con el path correcto
+    #     self.service = Service(PATH_DRIVER)
         
-        # Inicializar el WebDriver
-        self.driver = webdriver.Chrome(service=self.service, options=self.options)
+    #     # Inicializar el WebDriver
+    #     self.driver = webdriver.Chrome(service=self.service, options=self.options)
 
     def get_driver(self):
         return self.driver
@@ -326,13 +326,13 @@ if __name__ == "__main__":
     driver = driver_config.get_driver()
     selenium_helper = SeleniumHelper(driver)
 
-    driver_acm_config = WebDriverConfig(opcion=True)
-    driver_acm = driver_acm_config.get_driver()
+    # driver_acm_config = WebDriverConfig(opcion=True)
+    # driver_acm = driver_acm_config.get_driver()
 
     # Inyección de dependencias en las clases
     google_login = GoogleLogin(driver, selenium_helper)
     search_strategy = LibrarySearch(driver, selenium_helper)
-    acm_download= AcmDownload(driver_acm, selenium_helper) 
+    acm_download= AcmDownload(driver_config, selenium_helper) 
     science_download= ScienceDirectDownload(driver, selenium_helper)
     ieee_download= IEEEDownload(driver, selenium_helper)
     automation_flow = AutomationFlow(search_strategy, 

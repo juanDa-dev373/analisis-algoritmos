@@ -1,4 +1,4 @@
-from .Sort_Algorithm import SortAlgorithm
+from .SortAlgorithm import SortAlgorithm
 from tqdm import tqdm
 
 class HeapSort(SortAlgorithm):
@@ -8,16 +8,17 @@ class HeapSort(SortAlgorithm):
         left = 2 * i + 1
         right = 2 * i + 2
 
-        if left < n and arr[left][2] > arr[largest][2]:
+        if left < n and arr[left][self.column_index] > arr[largest][self.column_index]:
             largest = left
-        if right < n and arr[right][2] > arr[largest][2]:
+        if right < n and arr[right][self.column_index] > arr[largest][self.column_index]:
             largest = right
 
         if largest != i:
             arr[i], arr[largest] = arr[largest], arr[i]
             self.heapify(arr, n, largest)
 
-    def sort(self, array):
+    def sort(self, array, column_index=0):
+        self.column_index = column_index
         n = len(array)
         for i in tqdm(range(n // 2 - 1, -1, -1), desc="Construyendo Heap", unit="parte"):
             self.heapify(array, n, i)

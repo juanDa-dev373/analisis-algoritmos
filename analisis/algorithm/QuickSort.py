@@ -1,10 +1,11 @@
-from .Sort_Algorithm import SortAlgorithm
+from .SortAlgorithm import SortAlgorithm
 import random
 from tqdm import tqdm
 
 class QuickSort(SortAlgorithm):
-    def sort(self, data):
+    def sort(self, data, column_index=0):
         data = data.copy() 
+        self.column_index = column_index
         self._quick_sort(data)
         return data
 
@@ -22,10 +23,10 @@ class QuickSort(SortAlgorithm):
     def _partition(self, arr, low, high):
         pivot_index = random.randint(low, high)
         arr[pivot_index], arr[high] = arr[high], arr[pivot_index]
-        pivot = arr[high][2]  # Se asume que arr es una lista de listas o tuplas y estamos ordenando por el tercer elemento
+        pivot = arr[high][self.column_index]  # Se asume que arr es una lista de listas o tuplas y estamos ordenando por el tercer elemento
         i = low - 1
         for j in range(low, high):
-            if arr[j][2] <= pivot:
+            if arr[j][self.column_index] <= pivot:
                 i += 1
                 arr[i], arr[j] = arr[j], arr[i]
         arr[i + 1], arr[high] = arr[high], arr[i + 1]

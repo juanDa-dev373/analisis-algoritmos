@@ -1,7 +1,6 @@
 import os
 from colorama import Fore, Style
 from django.shortcuts import render
-import pandas as pd
 
 from analisis.algorithm.BitonicSort import BitonicSort
 from analisis.algorithm.BucketSort import BucketSort
@@ -12,7 +11,7 @@ from analisis.algorithm.PigeonholeSort import PigeonholeSort
 from analisis.algorithm.RadixSort import RadixSort
 from analisis.algorithm.TreeSort import TreeSort
 
-from .algorithm.TimeSort import TimeSort
+from .algorithm.TimSort import TimSort
 from .algorithm.BinaryInsertionSort import BinaryInsertionSort
 from .analysis.SortingAnalyzer import SortingAnalyzer
 from .algorithm.SelectionSort import SelectionSort
@@ -26,7 +25,7 @@ def loading_screen(request, method):
 
 def menu_ordenamiento(request):
     metodos = [
-        {"nombre": "TimeSort", 'slug': 'time', "complejidad": "O(n log n)"},
+        {"nombre": "TimSort", 'slug': 'tim', "complejidad": "O(n log n)"},
         {"nombre": "Comb Sort", 'slug': 'comb', "complejidad": "O(n^2)"},
         {'nombre': 'Selection Sort', 'slug': 'selection', 'complejidad': 'O(n²)'},
         {"nombre": "Tree Sort", 'slug': 'tree', "complejidad": "O(n log n)"},
@@ -42,7 +41,7 @@ def menu_ordenamiento(request):
     return render(request, 'metodos_ordenamiento/menu.html', {"metodos": metodos})
 
 def sort(request, method):
-    input_file_path = 'analisis/static/assets/Data_Final/datafinalbib.bib'
+    input_file_path = 'analisis/static/assets/Data_Final/datafinalbib.csv'
     output_file_path = f'analisis/static/assets/Data_Final/sorted_{method}.bib'
 
     # Verificar si el archivo de entrada existe o crearlo
@@ -52,11 +51,11 @@ def sort(request, method):
 
     # Cargar y procesar los datos
     dataset_processor = DatasetProcessor(input_file_path, output_file_path)
-    dataset = dataset_processor.load_and_process()
+    dataset = dataset_processor.load_data()
 
     # Métodos de ordenamiento disponibles
     sorting_methods = {
-        'time': TimeSort,
+        'tim': TimSort,
         'comb': CombSort,
         'selection': SelectionSort,
         'tree': TreeSort,
@@ -76,7 +75,7 @@ def sort(request, method):
 
     # Aplicar el algoritmo de ordenamiento
     sorter = sorter_class()
-    sorted_books = sorter.sort(dataset.copy())
+    sorted_books = sorter.sort(dataset.copy(), 1)
     
     # Analizar y visualizar los resultados
     analyzer = SortingAnalyzer(sorter, f"analisis/static/assets/Data_Ordenamiento/{method}", method)

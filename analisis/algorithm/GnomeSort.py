@@ -1,8 +1,8 @@
-from .Sort_Algorithm import SortAlgorithm
+from .SortAlgorithm import SortAlgorithm
 from tqdm import tqdm
 
 class GnomeSort(SortAlgorithm):
-    def sort(self, arr):
+    def sort(self, arr, column_index=0):
         n = len(arr)
         index = 0
         step = max(1, n // 100)
@@ -11,7 +11,7 @@ class GnomeSort(SortAlgorithm):
             while index < n:
                 if index == 0:
                     index += 1
-                if arr[index][2] >= arr[index - 1][2]:
+                if arr[index][column_index] >= arr[index - 1][column_index]:
                     index += 1
                 else:
                     arr[index], arr[index - 1] = arr[index - 1], arr[index]
