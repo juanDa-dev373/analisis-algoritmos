@@ -111,9 +111,9 @@ class JournalGraphBuilder:
         node_colors = [cmap(partition[node]) for node in self.graph.nodes()]
         node_sizes = [300 + 40 * self.graph.degree(node) for node in self.graph.nodes()]
         edge_widths = [0.5 + self.graph[u][v]['weight'] * 0.2 for u, v in self.graph.edges()]
-
+        #edge_colors = [node_color_dict[u] for u, v in self.graph.edges()]
         plt.figure(figsize=(22, 18))
-        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors=node_colors)
+        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors='black')
         nx.draw_networkx_edges(self.graph, pos, width=edge_widths, alpha=0.1)
         nx.draw_networkx_labels(self.graph, pos, font_size=10, font_family='sans-serif')
 
