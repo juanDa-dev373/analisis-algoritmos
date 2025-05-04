@@ -104,7 +104,7 @@ class JournalGraphBuilder:
         partition = community_louvain.best_partition(self.graph)
 
         # Posiciones con layout forzado
-        pos = nx.spring_layout(self.graph, k=0.35, seed=42)
+        pos = nx.spring_layout(self.graph, k=9, seed=42)
 
         # Colores y tamaños
         cmap = plt.get_cmap('tab20')
@@ -113,14 +113,14 @@ class JournalGraphBuilder:
         edge_widths = [0.5 + self.graph[u][v]['weight'] * 0.2 for u, v in self.graph.edges()]
 
         plt.figure(figsize=(22, 18))
-        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors='black')
-        nx.draw_networkx_edges(self.graph, pos, width=edge_widths, alpha=0.4)
+        nx.draw_networkx_nodes(self.graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors=node_colors)
+        nx.draw_networkx_edges(self.graph, pos, width=edge_widths, alpha=0.1)
         nx.draw_networkx_labels(self.graph, pos, font_size=10, font_family='sans-serif')
 
         plt.title("Co-Word Network Visualization (Louvain Communities)", fontsize=18, fontweight='bold')
         plt.axis('off')
         plt.tight_layout()
-        output_file = os.path.join(self.output_path, "graph", "co_word_graph.png")
+        output_file = os.path.join(self.output_path+"/graph", "co_word_graph.png")
         plt.savefig(output_file, dpi=300)
         plt.close()
         print(f"Grafo guardado en: {output_file}")
