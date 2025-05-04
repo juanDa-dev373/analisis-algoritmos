@@ -12,6 +12,7 @@ class BucketSort(SortAlgorithm):
         :param column_index: Índice de la columna a ordenar.
         :return: Lista ordenada.
         """
+        
         if not array:
             raise ValueError("El dataset está vacío o no tiene datos")
 
