@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -8,6 +9,9 @@ from collections import defaultdict
 from wordcloud import WordCloud
 import community as community_louvain
 import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from scipy.cluster.hierarchy import linkage, dendrogram
 
 init(autoreset=True)
 
@@ -31,6 +35,7 @@ class JournalGraphBuilder:
         self.generate_global_wordcloud()
         self._draw_and_save_graph()
         self.generar_graficas_por_categoria()
+        self._generate_dendrograms()
         self._print_success()
 
     def _print_title(self):
@@ -187,6 +192,36 @@ class JournalGraphBuilder:
             plt.savefig(output_file, dpi=300)
             plt.close()
 
+    def _generate_dendrograms(self):
+        sys.setrecursionlimit(3000)
+        os.makedirs(self.output_path + "/dendrograms", exist_ok=True)
+
+        abstracts = self.df['Abstract'].tolist()
+        titles = self.df['Title'].fillna('Sin título').tolist()
+
+        vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = vectorizer.fit_transform(abstracts)
+        similarity_matrix = cosine_similarity(tfidf_matrix)
+        distance_matrix = 1 - similarity_matrix
+
+        # Lista de métodos a comparar
+        metodos = ['ward', 'average']
+
+        for metodo in metodos:
+            linkage_matrix = linkage(distance_matrix, method=metodo)
+
+            plt.figure(figsize=(18, 10))
+            dendrogram(linkage_matrix, labels=titles, leaf_rotation=90)
+            plt.title(f"Dendrograma de Agrupamiento - Método: {metodo.capitalize()}")
+            plt.xlabel("Artículos")
+            plt.ylabel("Distancia")
+            plt.tight_layout()
+
+            output_file = os.path.join(self.output_path + "/dendrograms", f"abstracts_dendrogram_{metodo}.png")
+            plt.savefig(output_file, dpi=300)
+            plt.close()
+            print(f"Dendrograma ({metodo}) guardado en: {output_file}")
+            
 if __name__ == "__main__":
     builder = JournalGraphBuilder(
         data_path= os.path.join(os.path.dirname(__file__), "../static/assets/Data_Final/datafinalbib.csv"),
