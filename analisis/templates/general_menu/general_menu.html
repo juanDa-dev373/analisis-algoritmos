@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú Principal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #e0f7fa, #e1bee7);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 40px 0 20px;
+            color: #2c3e50;
+            font-size: 2.5em;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+        }
+        button.card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.3s;
+            text-align: center;
+        }
+        button.card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        button.card:focus, button.card:active {
+            outline: none;
+            box-shadow: none;
+        }
+        .menu-nombre {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .descripcion {
+            font-size: 1em;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <h1>Menú Principal</h1>
+    <div class="container">
+        <button onclick="window.location.href='{% url 'menu_ordenamiento' %}'" class="card">
+            <div class="menu-nombre">Métodos de Ordenamiento</div>
+            <div class="descripcion">Algoritmos para ordenar datos</div>
+        </button>
+        <button onclick="window.location.href='{% url 'menu_analysis_methods' %}'" class="card">
+            <div class="menu-nombre">Métodos de Análisis</div>
+            <div class="descripcion">Herramientas para analizar datos</div>
+        </button>
+    </div>
+</body>
+</html>

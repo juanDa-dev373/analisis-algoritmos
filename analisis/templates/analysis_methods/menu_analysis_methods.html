@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Métodos de Análisis</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #e0f7fa, #e1bee7);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin: 40px 0 20px;
+            color: #2c3e50;
+            font-size: 2.5em;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            width: 90%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+        a.card {
+            text-decoration: none;
+            display: block;
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.3s;
+            text-align: center;
+        }
+        a.card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        .metodo-nombre {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 10px;
+        }
+        .descripcion {
+            font-size: 0.95em;
+            color: #7f8c8d;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 12px 18px;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Métodos de Análisis</h1>
+    <div class="container">
+        <a href="{% url 'analizar_frecuencia' %}" class="card">
+            <div class="metodo-nombre">Analizar Frecuencia</div>
+            <div class="descripcion">Análisis de frecuencia de palabras en textos</div>
+        </a>
+        <a href="{% url 'generar_dendograma' %}" class="card">
+            <div class="metodo-nombre">Generar Dendograma</div>
+            <div class="descripcion">Visualización jerárquica de datos</div>
+        </a>
+        <a href="{% url 'generar_nube_palabras' %}" class="card">
+            <div class="metodo-nombre">Generar Nube de Palabras</div>
+            <div class="descripcion">Representación visual de frecuencia de palabras</div>
+        </a>
+        <a href="{% url 'graficas_frecuencia' %}" class="card">
+            <div class="metodo-nombre">Gráficas de Frecuencia</div>
+            <div class="descripcion">Visualización de datos de frecuencia</div>
+        </a>
+    </div>
+    <a href="{% url 'menu_general' %}" class="back-button">Volver al Menú Principal</a>
+</body>
+</html>
