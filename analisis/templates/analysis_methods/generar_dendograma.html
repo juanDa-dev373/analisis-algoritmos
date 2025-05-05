@@ -26,6 +26,24 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .button-group {
+            margin-top: 20px;
+        }
+        .type-button {
+            padding: 12px 24px;
+            margin: 10px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .type-button:hover {
+            background-color: #3700b3;
         }
         .back-button {
             display: inline-block;
@@ -45,8 +63,11 @@
 <body>
     <h1>Generar Dendograma</h1>
     <div class="container">
-        <p>Aquí va el contenido para generar dendogramas.</p>
-       
+        <p>Elige el tipo de dendograma.</p>
+        <div class="button-group">
+            <button class="type-button">Tipo 1</button>
+            <button class="type-button">Tipo 2</button>
+        </div>
     </div>
     <a href="{% url 'menu_analysis_methods' %}" class="back-button">Volver a Métodos de Análisis</a>
 </body>
