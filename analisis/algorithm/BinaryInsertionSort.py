@@ -6,7 +6,7 @@ class BinaryInsertionSort(SortAlgorithm):
     def binary_search(self, sub_arr, val, start, end):
         while start <= end:
             mid = (start + end) // 2
-            if sub_arr[mid][self.column_index] < val:
+            if  self._safe_compare(val, sub_arr[mid][self.column_index]):
                 start = mid + 1
             else:
                 end = mid - 1

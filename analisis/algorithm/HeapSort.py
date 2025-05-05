@@ -8,9 +8,9 @@ class HeapSort(SortAlgorithm):
         left = 2 * i + 1
         right = 2 * i + 2
 
-        if left < n and arr[left][self.column_index] > arr[largest][self.column_index]:
+        if left < n and self._safe_compare(arr[left][self.column_index], arr[largest][self.column_index]):
             largest = left
-        if right < n and arr[right][self.column_index] > arr[largest][self.column_index]:
+        if right < n and self._safe_compare(arr[right][self.column_index], arr[largest][self.column_index]):
             largest = right
 
         if largest != i:

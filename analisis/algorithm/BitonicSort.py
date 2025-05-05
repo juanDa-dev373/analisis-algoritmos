@@ -6,12 +6,14 @@ class BitonicSort(SortAlgorithm):
 
     def sort(self, array, column_index=0):
         self.column_index = column_index
+        original_length = len(array)
         n = 1
-        while n < len(array):
+        while n < original_length:
             n *= 2
         array.extend([(None, None, float('inf'))] * (n - len(array)))
         self._bitonic_sort(array, 0, n, self.direction)
-        return array
+        return array[:original_length]
+
 
     def _bitonic_sort(self, arr, low, cnt, direction):
         if cnt > 1:
@@ -24,8 +26,8 @@ class BitonicSort(SortAlgorithm):
         if cnt > 1:
             k = cnt // 2
             for i in range(low, low + k):
-                if ((direction == 1 and arr[i][self.column_index] > arr[i + k][self.column_index]) or 
-                    (direction == 0 and arr[i][self.column_index] < arr[i + k][self.column_index])):
+                if ((direction == 1 and self._safe_compare(arr[i][self.column_index], arr[i + k][self.column_index])) or 
+                    (direction == 0 and self._safe_compare(arr[i + k][self.column_index], arr[i][self.column_index]))):
                     arr[i], arr[i + k] = arr[i + k], arr[i]
             self._bitonic_merge(arr, low, k, direction)
             self._bitonic_merge(arr, low + k, k, direction)
