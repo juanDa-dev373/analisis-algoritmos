@@ -2,16 +2,25 @@ import os
 import re
 import sys
 import pandas as pd
+import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 from colorama import Style, init, Fore
 from collections import defaultdict
 from wordcloud import WordCloud
 import community as community_louvain
-import matplotlib.pyplot as plt
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-from scipy.cluster.hierarchy import linkage, dendrogram
+from sklearn.metrics import adjusted_rand_score
+from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+import nltk
+
+nltk.download('punkt')
+nltk.download('stopwords')
+nltk.download('wordnet')
 
 init(autoreset=True)
 
@@ -45,8 +54,25 @@ class JournalGraphBuilder:
 
     def _load_and_prepare_data(self) -> pd.DataFrame:
         df = pd.read_csv(self.data_path)
-        df['Abstract'] = df['Abstract'].fillna('').str.lower()
+        df['Abstract'] = df['Abstract'].fillna('').apply(self._preprocess_text)
+        # Vectorizar todos los abstracts
+        vectorizer = TfidfVectorizer(stop_words='english')
+        tfidf_matrix = vectorizer.fit_transform(df['Abstract'])
+        # Calcular matriz de similitud de coseno
+        similarity_matrix = cosine_similarity(tfidf_matrix)
+        # Sumar las similitudes de cada abstract con los demás
+        similarity_scores = similarity_matrix.sum(axis=1)
+        # Obtener los índices de los 50 abstracts más similares
+        top_indices = similarity_scores.argsort()[-50:][::-1]
+        # Filtrar DataFrame para quedarse con esos 50
+        df = df.iloc[top_indices].reset_index(drop=True)
         return df
+
+    def _preprocess_text(self, text: str) -> str:
+        lemmatizer = WordNetLemmatizer()
+        words = word_tokenize(text.lower())
+        words = [lemmatizer.lemmatize(w) for w in words if w.isalpha() and w not in stopwords.words('english')]
+        return ' '.join(words)
 
     def _load_categories_from_txt(self) -> dict:
         categorias = {}
@@ -55,7 +81,7 @@ class JournalGraphBuilder:
         categoria_actual = None
         for line in lines:
             if line in {"Habilidades", "Conceptos Computationales", "Actitudes", "Propiedades psicométricas", "Herramienta de evaluación",
-            "Diseño de investigación", "Nivel de escolaridad", "Medio", "Estrategia", "Herramienta"}:
+                        "Diseño de investigación", "Nivel de escolaridad", "Medio", "Estrategia", "Herramienta"}:
                 categoria_actual = line
                 categorias[categoria_actual] = []
             else:
@@ -68,7 +94,7 @@ class JournalGraphBuilder:
             for var in variables:
                 sinónimos = var.split('-')
                 for abstract in self.df['Abstract']:
-                    if any(re.search(rf'\b{re.escape(s)}\b', abstract) for s in sinónimos):
+                    if any(re.search(rf'\\b{re.escape(s)}\\b', abstract) for s in sinónimos):
                         frecuencias[var] += sum(abstract.count(s) for s in sinónimos)
             self.frecuencias_categoria[categoria] = dict(frecuencias)
 
@@ -86,16 +112,12 @@ class JournalGraphBuilder:
                 plt.close()
 
     def generate_global_wordcloud(self):
-        from collections import defaultdict
         os.makedirs(self.output_path + "/word-clouds", exist_ok=True)
-
-        # Unificar todas las frecuencias en un solo diccionario
         global_freqs = defaultdict(int)
         for freqs in self.frecuencias_categoria.values():
             for palabra, count in freqs.items():
                 global_freqs[palabra] += count
 
-        # Crear y guardar la nube global
         if global_freqs:
             wc = WordCloud(width=1000, height=500, background_color='black').generate_from_frequencies(global_freqs)
             plt.figure()
@@ -106,8 +128,6 @@ class JournalGraphBuilder:
             plt.savefig(os.path.join(self.output_path + "/word-clouds", "wordcloud_global.png"))
             plt.close()
             print("Nube de palabras global guardada.")
-        else:
-            print("No hay frecuencias para generar la nube global.")
 
     def _build_co_word_graph(self):
         self.graph = nx.Graph()
@@ -131,21 +151,13 @@ class JournalGraphBuilder:
             return
 
         os.makedirs(self.output_path + "/graph", exist_ok=True)
-
-        # Detección de comunidades con Louvain
         partition = community_louvain.best_partition(self.graph)
-
-        # Posiciones con layout forzado
         pos = nx.spring_layout(self.graph, k=9, seed=42)
-
-        # Colores y tamaños
         cmap = plt.get_cmap('tab20')
         node_color_dict = {node: cmap(partition[node]) for node in self.graph.nodes()}
         node_colors = [node_color_dict[node] for node in self.graph.nodes()]
         node_sizes = [300 + 40 * self.graph.degree(node) for node in self.graph.nodes()]
         edge_widths = [0.5 + self.graph[u][v]['weight'] * 0.2 for u, v in self.graph.edges()]
-        
-        # Colores de las aristas según color del nodo de origen
         edge_colors = [node_color_dict[u] for u, v in self.graph.edges()]
 
         plt.figure(figsize=(22, 18))
@@ -161,41 +173,30 @@ class JournalGraphBuilder:
         plt.close()
         print(f"Grafo guardado en: {output_file}")
 
-
     def _print_success(self):
         print(Fore.GREEN + Style.BRIGHT + "=" * 60)
         print(Fore.GREEN + f"Análisis completado. Archivos guardados en: {self.output_path}")
         print(Fore.GREEN + "=" * 60)
 
     def generar_graficas_por_categoria(self):
-
         os.makedirs(self.output_path + "/bar-charts", exist_ok=True)
-
         for categoria, freqs in self.frecuencias_categoria.items():
             if not freqs:
-                continue  # Saltar si no hay datos
-
-            # Ordenar por frecuencia descendente
+                continue
             sorted_freqs = dict(sorted(freqs.items(), key=lambda item: item[1], reverse=True))
-
             plt.figure(figsize=(10, 6))
-            bars = plt.barh(list(sorted_freqs.keys()), list(sorted_freqs.values()), color='lightsteelblue', edgecolor='navy')
-
+            plt.barh(list(sorted_freqs.keys()), list(sorted_freqs.values()), color='lightsteelblue', edgecolor='navy')
             plt.xlabel("Frecuencia", fontsize=12, color="navy")
             plt.ylabel("Variables", fontsize=12, color="navy")
             plt.title(f"Frecuencia de Variables en la Categoría: {categoria}", fontsize=14, color="darkblue")
             plt.grid(axis='x', linestyle='--', linewidth=0.5)
             plt.tight_layout()
-
-            # Guardar imagen
-            output_file = os.path.join(self.output_path, "bar-charts", f"frecuencia_{categoria}.png")
+            output_file = os.path.join(self.output_path+"/bar-charts", f"frecuencia_{categoria}.png")
             plt.savefig(output_file, dpi=300)
             plt.close()
 
     def _generate_dendrograms(self):
-        sys.setrecursionlimit(3000)
         os.makedirs(self.output_path + "/dendrograms", exist_ok=True)
-
         abstracts = self.df['Abstract'].tolist()
         titles = self.df['Title'].fillna('Sin título').tolist()
 
@@ -204,24 +205,42 @@ class JournalGraphBuilder:
         similarity_matrix = cosine_similarity(tfidf_matrix)
         distance_matrix = 1 - similarity_matrix
 
-        # Lista de métodos a comparar
-        metodos = ['ward', 'average']
-
-        for metodo in metodos:
-            linkage_matrix = linkage(distance_matrix, method=metodo)
-
+        methods = ['ward', 'average']
+        for method in methods:
+            linkage_matrix = linkage(distance_matrix, method=method)
             plt.figure(figsize=(18, 10))
             dendrogram(linkage_matrix, labels=titles, leaf_rotation=90)
-            plt.title(f"Dendrograma de Agrupamiento - Método: {metodo.capitalize()}")
+            plt.title(f"Dendrograma de Agrupamiento - Método: {method.capitalize()}")
             plt.xlabel("Artículos")
             plt.ylabel("Distancia")
             plt.tight_layout()
-
-            output_file = os.path.join(self.output_path + "/dendrograms", f"abstracts_dendrogram_{metodo}.png")
+            output_file = os.path.join(self.output_path + "/dendrograms", f"abstracts_dendrogram_{method}.png")
             plt.savefig(output_file, dpi=300)
             plt.close()
-            print(f"Dendrograma ({metodo}) guardado en: {output_file}")
-            
+
+            # Comparar con categorías (solo para evaluar calidad de cluster)
+            cluster_labels = fcluster(linkage_matrix, t=5, criterion='maxclust')
+            true_labels = self._generate_true_labels()
+            ari = adjusted_rand_score(true_labels, cluster_labels)
+            print(f"ARI (Adjusted Rand Index) para método {method}: {ari:.4f}")
+
+    def _generate_true_labels(self):
+        """
+        Se asigna un índice entero a cada categoría que aparece en cada abstract.
+        Se usará para comparar con clustering real.
+        """
+        label_map = {cat: i for i, cat in enumerate(self.categorias)}
+        labels = []
+        for abstract in self.df['Abstract']:
+            found = False
+            for cat, variables in self.categorias.items():
+                if any(var in abstract for var in variables):
+                    labels.append(label_map[cat])
+                    found = True
+                    break
+            if not found:
+                labels.append(-1)  # Sin categoría encontrada
+        return labels            
 if __name__ == "__main__":
     builder = JournalGraphBuilder(
         data_path= os.path.join(os.path.dirname(__file__), "../static/assets/Data_Final/datafinalbib.csv"),
