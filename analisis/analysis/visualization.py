@@ -1,0 +1,77 @@
+import os
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+import networkx as nx
+import community as community_louvain
+
+class Visualization:
+    def generate_wordclouds(self, frecuencias_categoria, output_path):
+        os.makedirs(output_path + "/word-clouds", exist_ok=True)
+        for categoria, freqs in frecuencias_categoria.items():
+            if freqs:
+                wc = WordCloud(width=800, height=400).generate_from_frequencies(freqs)
+                plt.figure()
+                plt.title(f'Nube de Palabras - {categoria}')
+                plt.imshow(wc, interpolation='bilinear')
+                plt.axis('off')
+                plt.tight_layout()
+                plt.savefig(os.path.join(output_path + "/word-clouds", f'wordcloud_{categoria}.png'))
+                plt.close()
+
+    def generate_global_wordcloud(self, frecuencias_categoria, output_path):
+        os.makedirs(output_path + "/word-clouds", exist_ok=True)
+        global_freqs = {}
+        for freqs in frecuencias_categoria.values():
+            for palabra, count in freqs.items():
+                global_freqs[palabra] = global_freqs.get(palabra, 0) + count
+
+        if global_freqs:
+            wc = WordCloud(width=1000, height=500, background_color='black').generate_from_frequencies(global_freqs)
+            plt.figure()
+            plt.title("Nube de Palabras - Global")
+            plt.imshow(wc, interpolation='bilinear')
+            plt.axis('off')
+            plt.tight_layout()
+            plt.savefig(os.path.join(output_path + "/word-clouds", "wordcloud_global.png"))
+            plt.close()
+
+    def generate_bar_charts(self, frecuencias_categoria, output_path):
+        os.makedirs(output_path + "/bar-charts", exist_ok=True)
+        for categoria, freqs in frecuencias_categoria.items():
+            if not freqs:
+                continue
+            sorted_freqs = dict(sorted(freqs.items(), key=lambda item: item[1], reverse=True))
+            plt.figure(figsize=(10, 6))
+            plt.barh(list(sorted_freqs.keys()), list(sorted_freqs.values()), color='lightsteelblue', edgecolor='navy')
+            plt.xlabel("Frecuencia", fontsize=12, color="navy")
+            plt.ylabel("Variables", fontsize=12, color="navy")
+            plt.title(f"Frecuencia de Variables en la Categoría: {categoria}", fontsize=14, color="darkblue")
+            plt.grid(axis='x', linestyle='--', linewidth=0.5)
+            plt.tight_layout()
+            plt.savefig(os.path.join(output_path + "/bar-charts", f"frecuencia_{categoria}.png"))
+            plt.close()
+
+    def draw_and_save_graph(self, graph, output_path):
+        if not graph:
+            print("No se generó ningún grafo de co-ocurrencia.")
+            return
+        os.makedirs(output_path + "/graph", exist_ok=True)
+        partition = community_louvain.best_partition(graph)
+        pos = nx.spring_layout(graph, k=9, seed=42)
+        cmap = plt.get_cmap('tab20')
+        node_color_dict = {node: cmap(partition[node]) for node in graph.nodes()}
+        node_colors = [node_color_dict[node] for node in graph.nodes()]
+        node_sizes = [300 + 40 * graph.degree(node) for node in graph.nodes()]
+        edge_widths = [0.5 + graph[u][v]['weight'] * 0.2 for u, v in graph.edges()]
+        edge_colors = [node_color_dict[u] for u, v in graph.edges()]
+
+        plt.figure(figsize=(22, 18))
+        nx.draw_networkx_nodes(graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors='black')
+        nx.draw_networkx_edges(graph, pos, width=edge_widths, edge_color=edge_colors, alpha=0.4)
+        nx.draw_networkx_labels(graph, pos, font_size=10)
+        plt.title("Co-Word Network Visualization (Louvain Communities)", fontsize=18)
+        plt.axis('off')
+        plt.tight_layout()
+        output_file = os.path.join(output_path + "/graph", "co_word_graph.png")
+        plt.savefig(output_file, dpi=300)
+        plt.close()
