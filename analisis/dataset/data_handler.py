@@ -1,5 +1,7 @@
 import pandas as pd
 import re
+import csv
+from collections import defaultdict
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
@@ -13,9 +15,18 @@ class DataHandler:
         self.lemmatizer = WordNetLemmatizer()
         self.stop_words = set(stopwords.words('english'))
 
-    def load_and_prepare(self):
+    def _load_and_prepare_all_data(self) -> pd.DataFrame:
         df = pd.read_csv(self.data_path)
         df['Abstract'] = df['Abstract'].fillna('').apply(self.preprocess)
+        return df
+
+    def load_and_prepare(self)-> pd.DataFrame:
+        extra = self.read_csv_basic(self.data_path)
+        df = pd.DataFrame(extra)
+        try:
+            df['Abstract'] = df['Abstract'].fillna('').apply(self.preprocess)
+        except Exception as e:
+             print("Error en el preprocesamiento:", e)
         tfidf_matrix = TfidfVectorizer(stop_words='english').fit_transform(df['Abstract'])
         similarity_matrix = cosine_similarity(tfidf_matrix)
         similarity_scores = similarity_matrix.sum(axis=1)
@@ -40,3 +51,31 @@ class DataHandler:
             else:
                 categorias[categoria_actual].append(line.lower())
         return categorias
+    
+    def _compute_frequencies(self, categorias, df):
+        frecuencias_categoria = {}
+        for categoria, variables in categorias.items():
+            frecuencias = defaultdict(int)
+            for var in variables:
+                sinonimos = var.split('-')
+                for abstract in df['Abstract']:
+                    if any(s in abstract for s in sinonimos):
+                        frecuencias[var] += sum(abstract.count(s) for s in sinonimos)
+            frecuencias_categoria[categoria] = dict(frecuencias)
+        return frecuencias_categoria
+    
+    def read_csv_basic(self, path):
+        data = []
+        try:
+            with open(path, newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)  # Usa encabezados como claves
+                for row in reader:
+                    abstract = row.get("Abstract", "sin valor").strip().lower()  # obtiene y limpia
+                    if abstract and abstract not in {"sin valor"}:  # solo si no está vacío
+                        data.append(row)
+            print(f"Leídas {len(data)} filas válidas con Abstract desde el archivo CSV.")
+            return data
+        except FileNotFoundError:
+            print(f"Archivo no encontrado: {path}")
+        except Exception as e:
+            print(f"Error leyendo el archivo CSV: {e}")
