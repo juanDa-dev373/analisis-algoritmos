@@ -1,0 +1,150 @@
+Habilidades
+abstraction
+algorithm
+algorithmic thinking
+coding
+collaboration
+cooperation
+creativity
+critical thinking
+debug
+decomposition
+evaluation
+generalization
+logic-logical thinking
+modularity
+patterns recognition
+problem solving
+programming
+
+Conceptos
+computationales
+conditionals
+control structures
+directions
+events
+functions
+loops
+modular structure
+parallelism
+sequences
+software-hardware
+variables
+
+Actitudes
+emotional
+engagement
+motivation
+perceptions
+persistence
+self-efficacy
+self-perceived
+
+Propiedades psicométricas
+classical test theory - ctt
+confirmatory factor analysis - cfa
+exploratory factor analysis - efa
+item response theory - irt
+reliability
+structural equation model - sem
+validity
+
+Herramienta de evaluación
+beginners computational thinking test - bctt
+coding attitudes survey - escas
+collaborative computing observation instrument
+competent computational thinking test - cctt
+computational thinking skills test - ctst
+computational concepts
+computational thinking assessment for chinese elementary students - cta-ces
+computational thinking challenge - ctc
+computational thinking levels scale - ctls
+computational thinking scale - cts
+computational thinking skill levels scale - cts
+computational thinking test - ctt
+computational thinking test
+computational thinking test for elementary school students
+computational thinking test for lower primary - cttlp
+computational thinking-skill tasks on numbers and arithmetic
+computerized adaptive programming concepts test - capct
+ct scale - cts
+elementary student coding attitudes survey - escas
+general self-efficacy scale
+ict competency test
+instrument of computational identity
+kbit fluid intelligence subtest
+mastery of computational concepts test and an algorithmic test
+multidimensional 21st century skills scale
+self-efficacy scale
+stem learning attitude scale
+the computational thinking scale
+
+Diseño de investigación
+no experimental
+experimental
+longitudinal research
+mixed methods
+post-test
+pre-test
+quasi-experiments
+
+Nivel de escolaridad
+upper elementary education - upper elementary school
+primary school - primary education - elementary school
+early childhood education – kindergarten - preschool
+secondary school - secondary education
+high school - higher education
+university – college
+
+Medio
+block programming
+mobile application
+pair programming
+plugged activities
+programming
+robotics
+spreadsheet
+stem
+unplugged activities
+
+Estrategia
+construct-by-self mind mapping
+construct-on-scaffold mind mapping
+design-based learning
+evidence-centred design approach
+gamification
+reverse engineering pedagogy
+technology-enhanced learning
+collaborative learning
+cooperative learning
+flipped classroom
+game-based learning
+inquiry-based learning
+personalized learning
+problem-based learning
+project-based learning
+universal design for learning
+
+Herramienta
+alice
+arduino
+scratch
+scratchjr
+blockly games
+code.org
+codecombat
+csunplugged
+robot turtles
+hello ruby
+kodable
+lightbotjr
+kibo robots
+bee bot
+cubetto
+minecraft
+agent sheets
+mimo
+py– learn
+spacechem
+
+

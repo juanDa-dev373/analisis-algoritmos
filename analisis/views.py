@@ -18,7 +18,15 @@ from .algorithm.SelectionSort import SelectionSort
 from .algorithm.QuickSort import QuickSort
 from .dataset.dataset_processor import DatasetProcessor
 
-# Create your views here.
+
+def menu_general(request):
+    """Vista para el menú principal con las dos opciones"""
+    return render(request, 'general_menu/general_menu.html')
+
+def menu_analysis_methods(request):
+    """Vista para el menú de métodos de análisis"""
+    return render(request, 'analysis_methods/menu_analysis_methods.html')
+
 def loading_screen(request, method):
     """Vista que muestra la pantalla de carga antes de iniciar el ordenamiento"""
     return render(request, 'loading.html', {'method': method})
@@ -43,16 +51,16 @@ def menu_ordenamiento(request):
 def sort(request, method):
     input_file_path = 'analisis/static/assets/Data_Final/datafinalbib.csv'
     output_file_path = f'analisis/static/assets/Data_Final/sorted_{method}.bib'
+    
 
-    # Verificar si el archivo de entrada existe o crearlo
     os.makedirs(os.path.dirname(input_file_path), exist_ok=True)
     if not os.path.exists(input_file_path):
         return render(request, 'error.html', {'message': 'El archivo de datos no existe'})
-
+    
     # Cargar y procesar los datos
     dataset_processor = DatasetProcessor(input_file_path, output_file_path)
     dataset = dataset_processor.load_data()
-
+    
     # Métodos de ordenamiento disponibles
     sorting_methods = {
         'tim': TimSort,
@@ -68,11 +76,11 @@ def sort(request, method):
         'binary': BinaryInsertionSort,
         'radix': RadixSort
     }
-
+    
     sorter_class = sorting_methods.get(method)
     if not sorter_class:
         return render(request, 'error.html', {'message': 'Método de ordenamiento no válido'})
-
+    
     # Aplicar el algoritmo de ordenamiento
     sorter = sorter_class()
     sorted_books = sorter.sort(dataset.copy(), 1)
@@ -84,14 +92,30 @@ def sort(request, method):
     analyzer.analyze(dataset[:len(dataset) // 4], "Un cuarto de datos", len(dataset) // 4)
     analyzer.analyze(dataset[:100], "Primeros 100 datos", 100)
     analyzer.plot_results()
-
+    
     print(Fore.MAGENTA + f"Ordenamiento completo con {method}." + Style.RESET_ALL)
-
     image_url = f'/static/assets/Data_Ordenamiento/{method}/tiempo_vs_tamaño.png'
-
+    
     return render(request, 'sort_results/sort_results.html', {
         'sorted_books': sorted_books,
         'method': method,
         'output_file': output_file_path,
         'image_url': image_url
     })
+
+# Vistas para los métodos de análisis
+def analizar_frecuencia(request):
+    # Implementación de la vista para analizar frecuencia
+    return render(request, 'analysis_methods/analizar_frecuencia.html')
+
+def generar_dendograma(request):
+    # Implementación de la vista para generar dendograma
+    return render(request, 'analysis_methods/generar_dendograma.html')
+
+def generar_nube_palabras(request):
+    # Implementación de la vista para generar nube de palabras
+    return render(request, 'analysis_methods/generar_nube_palabras.html')
+
+def graficas_frecuencia(request):
+    # Implementación de la vista para gráficas de frecuencia
+    return render(request, 'analysis_methods/graficas_frecuencia.html')
