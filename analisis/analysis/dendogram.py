@@ -26,14 +26,21 @@ class DrawDendogram:
         for method in methods:
             print(Fore.YELLOW+f"se inicia generacion de los dendograma: {method}...")
             linkage_matrix = linkage(distance_matrix, method=method)
-            plt.figure(figsize=(18, 10))
-            dendrogram(linkage_matrix, labels=titles, leaf_rotation=90)
+            plt.figure(figsize=(20, 16))
+
+            dendrogram(
+                linkage_matrix,
+                labels=titles,
+                leaf_rotation=90,
+                leaf_font_size=8,
+                color_threshold=0.7 * max(linkage_matrix[:, 2])
+            )
             plt.title(f"Dendrograma de Agrupamiento - Método: {method.capitalize()}")
             plt.xlabel("Artículos")
             plt.ylabel("Distancia")
             plt.tight_layout()
             output_file = os.path.join(output_path + "/dendrograms", f"abstracts_dendrogram_{method}.png")
-            plt.savefig(output_file, dpi=300)
+            plt.savefig(output_file, dpi=100)
             plt.close()
 
             # Comparar con categorías (solo para evaluar calidad de cluster)
