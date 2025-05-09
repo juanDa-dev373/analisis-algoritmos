@@ -18,6 +18,7 @@ class JournalGraphBuilder:
         self.categorias = {}
         self.frecuencias_categoria = {}
         self.graph = nx.Graph()
+        self.visualition = Visualization()
 
     def run(self):
         dataHandler = DataHandler(self.data_path, self.category_path)
@@ -28,18 +29,37 @@ class JournalGraphBuilder:
         #print(self.df['Abstract'])
         abstracts = self.df['Abstract']
         self.graph = graph.build_graph(abstracts, self.categorias)
-        visualition = Visualization()
-        visualition.draw_and_save_graph(self.graph, self.output_path)
+        #visualition = Visualization()
+        
+        drawSaveGraph()
+        #visualition.draw_and_save_graph(self.graph, self.output_path)
         
         dfs = dataHandler._load_and_prepare_all_data()
         frecuencies = dataHandler._compute_frequencies(self.categorias, dfs)
-        visualition.generate_bar_charts(frecuencies, self.output_path)
-        visualition.generate_wordclouds(frecuencies, self.output_path)
-        visualition.generate_global_wordcloud(frecuencies, self.output_path)
+
+        drawGenerateBarCharts(self, frecuencies, self.output_path)
+        #visualition.generate_bar_charts(frecuencies, self.output_path)
+        
+        drawWordClouds(self, frecuencies, self.output_path)
+        #visualition.generate_wordclouds(frecuencies, self.output_path)
+        
+        drawGlobalWordCloud(self, frecuencies)
+        #visualition.generate_global_wordcloud(frecuencies, self.output_path)
 
         dendogram = DrawDendogram()
         dendogram._generate_dendrograms(self.df, self.output_path, self.categorias)
 
+    def drawSaveGraph(self):
+        self.visualition.draw_and_save_graph(self.graph, self.output_path)
+
+    def drawGenerateBarCharts(self, frecuencies, output_path):
+        self.visualition.generate_bar_charts(frecuencies, output_path)
+
+    def drawWordClouds(self, frecuencies, output_path):
+        self.visualition.generate_wordclouds(frecuencies, output_path)
+
+    def drawGlobalWordCloud(self, frecuencies):
+        self.visualition.generate_global_wordcloud(frecuencies, self.output_path)
 
 
 if __name__ == "__main__":
