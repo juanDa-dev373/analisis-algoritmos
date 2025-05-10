@@ -30,20 +30,20 @@ class JournalGraphBuilder:
         abstracts = self.df['Abstract']
         self.graph = graph.build_graph(abstracts, self.categorias)
         #visualition = Visualization()
-        
-        drawSaveGraph()
+
+        self.drawSaveGraph()
         #visualition.draw_and_save_graph(self.graph, self.output_path)
         
         dfs = dataHandler._load_and_prepare_all_data()
         frecuencies = dataHandler._compute_frequencies(self.categorias, dfs)
 
-        drawGenerateBarCharts(self, frecuencies, self.output_path)
+        self.drawGenerateBarCharts(self, frecuencies, self.output_path)
         #visualition.generate_bar_charts(frecuencies, self.output_path)
         
-        drawWordClouds(self, frecuencies, self.output_path)
+        self.drawWordClouds(self, frecuencies, self.output_path)
         #visualition.generate_wordclouds(frecuencies, self.output_path)
         
-        drawGlobalWordCloud(self, frecuencies)
+        self.drawGlobalWordCloud(self, frecuencies)
         #visualition.generate_global_wordcloud(frecuencies, self.output_path)
 
         dendogram = DrawDendogram()
