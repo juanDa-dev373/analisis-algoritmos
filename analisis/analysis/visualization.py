@@ -71,7 +71,7 @@ class Visualization:
         
     def draw_and_save_graph(self, graph, output_path):
         if not graph:
-            print("No se generó ningún grafo de co-ocurrencia.")
+            print("No se generó ningún grafo de concurrencia.")
             return
         print("se inicio el dibujo del grafo...")
         os.makedirs(output_path + "/graph", exist_ok=True)
