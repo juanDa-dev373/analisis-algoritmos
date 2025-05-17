@@ -37,13 +37,13 @@ class JournalGraphBuilder:
         dfs = dataHandler._load_and_prepare_all_data()
         frecuencies = dataHandler._compute_frequencies(self.categorias, dfs)
 
-        self.drawGenerateBarCharts(self, frecuencies, self.output_path)
+        self.drawGenerateBarCharts(frecuencies, self.output_path)
         #visualition.generate_bar_charts(frecuencies, self.output_path)
         
-        self.drawWordClouds(self, frecuencies, self.output_path)
+        self.drawWordClouds(frecuencies, self.output_path)
         #visualition.generate_wordclouds(frecuencies, self.output_path)
         
-        self.drawGlobalWordCloud(self, frecuencies)
+        self.drawGlobalWordCloud( frecuencies)
         #visualition.generate_global_wordcloud(frecuencies, self.output_path)
 
         dendogram = DrawDendogram()
