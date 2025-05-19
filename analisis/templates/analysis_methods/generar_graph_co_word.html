@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Graficas requerimiento 2</title>
+    <title>Generar Grafo</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -65,16 +65,13 @@
     </style>
 </head>
 <body>
-    <h1>Graficas requerimiento 2</h1>
+    <h1>Grafo</h1>
     <div class="container">
         <div class="carousel">
             <img id="carousel-image" src="{{ image_url_list.0 }}" alt="Gráfica de frecuencia">
-            <div class="controls">
-                <button onclick="prevImage()">⟨</button>
-                <button onclick="nextImage()">⟩</button>
-            </div>
         </div>
 
+        <a href="{% url 'loading_screen_simple' 'generar_grafo' %}" class="back-button">Generar dendogramas</a>
         <a href="{% url 'menu_analysis_methods' %}" class="back-button">Volver a Métodos de Análisis</a>
     </div>
 

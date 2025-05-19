@@ -27,9 +27,13 @@
         }
     </style>
     <script>
-        setTimeout(() => {
-            window.location.href = "{% url 'sort_books' method=method %}";
-        }, 2000);  // Redirige en 2 segundos
+    setTimeout(() => {
+        {% if method %}
+            window.location.href = "{% url url method 0 %}";
+        {% else %}
+            window.location.href = "{% url url %}";
+        {% endif %}
+    }, 10); 
     </script>
 </head>
 <body>

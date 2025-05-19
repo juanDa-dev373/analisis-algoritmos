@@ -73,14 +73,18 @@
     <h1>Métodos de Análisis</h1>
     <div class="container">
         <a href="{% url 'analizar_frecuencia' %}" class="card">
-            <div class="metodo-nombre">Analizar Frecuencia</div>
+            <div class="metodo-nombre">Graficas requerimiento 2</div>
             <div class="descripcion">Análisis de frecuencia de palabras en textos</div>
         </a>
-        <a href="{% url 'generar_dendograma' %}" class="card">
+        <a href="{% url 'mostrar_grafo' %}" class="card">
+            <div class="metodo-nombre">Generar grafo</div>
+            <div class="descripcion">Grafo de las relaciones de los abstracs</div>
+        </a>
+        <a href="{% url 'mostrar_dendograma' %}" class="card">
             <div class="metodo-nombre">Generar Dendograma</div>
             <div class="descripcion">Visualización jerárquica de datos</div>
         </a>
-        <a href="{% url 'generar_nube_palabras' %}" class="card">
+        <a href="{% url 'mostrar_nube_palabras' %}" class="card">
             <div class="metodo-nombre">Generar Nube de Palabras</div>
             <div class="descripcion">Representación visual de frecuencia de palabras</div>
         </a>

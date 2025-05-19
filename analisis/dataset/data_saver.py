@@ -1,4 +1,6 @@
 import os
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from typing import List
 import pandas as pd
 from colorama import Style, init, Fore
@@ -28,9 +30,11 @@ class DataSaver:
         bib_database = BibDatabase()
         bib_database.entries = []
 
+
         for _, row in df.iterrows():
+            entry_type = str(row.get('EntryType', 'article')).strip().lower()
             entry = {
-                'ENTRYTYPE': 'article',  # Puedes ajustar según el tipo de referencia
+                'ENTRYTYPE': entry_type,  # Puedes ajustar según el tipo de referencia
                 'ID': row.get('Title', 'unknown').replace(" ", "_"),
                 'author': row.get('Autor', 'Sin Valor'),
                 'title': row.get('Title', 'Sin Valor'),
@@ -40,7 +44,8 @@ class DataSaver:
                 'pages': f"{row.get('Start Page', '')}-{row.get('End Page', '')}" if row.get('Start Page') != 'Sin Valor' else 'Sin Valor',
                 'abstract': row.get('Abstract', 'Sin Valor'),
                 'doi': row.get('DOI', 'Sin Valor'),
-                'journal': row.get('Database', 'Sin Valor')
+                'journal': row.get('Journal', 'Sin Valor'),
+                'publisher': row.get('Publisher', 'Sin valor')
             }
             bib_database.entries.append(entry)
         

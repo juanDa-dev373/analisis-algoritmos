@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Gráficas de Frecuencia</title>
+    <title>Gráficas Frecuencia</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -26,11 +26,33 @@
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .carousel img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        .controls {
+            margin-top: 15px;
+        }
+        .controls button {
+            padding: 10px 15px;
+            margin: 0 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
         }
         .back-button {
             display: inline-block;
             padding: 12px 18px;
-            margin-top: 20px;
+            margin-top: 30px;
             text-decoration: none;
             background-color: #007BFF;
             color: white;
@@ -43,11 +65,38 @@
     </style>
 </head>
 <body>
-    <h1>Gráficas de Frecuencia</h1>
+    <h1>Gráficas Frecuencia</h1>
     <div class="container">
-        <p>Aquí va el contenido para generar gráficas de frecuencia.</p>
-       
+        <div class="carousel">
+            <img id="carousel-image" src="{{ image_url_list.0 }}" alt="Gráfica de frecuencia">
+            <div class="controls">
+                <button onclick="prevImage()">⟨</button>
+                <button onclick="nextImage()">⟩</button>
+            </div>
+        </div>
+
+        <a href="{% url 'loading_screen_simple' 'generar_graficas_frecuencia' %}" class="back-button">Generar graficas frecuencia</a>
+        <a href="{% url 'menu_analysis_methods' %}" class="back-button">Volver a Métodos de Análisis</a>
     </div>
-    <a href="{% url 'menu_analysis_methods' %}" class="back-button">Volver a Métodos de Análisis</a>
+
+    <script>
+        const imageUrls = {{ image_url_list | safe }};
+        let currentIndex = 0;
+
+        function showImage(index) {
+            const imgElement = document.getElementById('carousel-image');
+            imgElement.src = imageUrls[index];
+        }
+
+        function nextImage() {
+            currentIndex = (currentIndex + 1) % imageUrls.length;
+            showImage(currentIndex);
+        }
+
+        function prevImage() {
+            currentIndex = (currentIndex - 1 + imageUrls.length) % imageUrls.length;
+            showImage(currentIndex);
+        }
+    </script>
 </body>
 </html>

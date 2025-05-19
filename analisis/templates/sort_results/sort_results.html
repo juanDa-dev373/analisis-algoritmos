@@ -72,6 +72,43 @@
         .btn:hover {
             background-color: #0056b3;
         }
+
+        .select-wrapper {
+            margin: 20px auto;
+            max-width: 300px;
+            text-align: left;
+        }
+
+        .select-wrapper label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #007BFF;
+        }
+
+        .styled-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid #007BFF;
+            border-radius: 8px;
+            background-color: #fff;
+            font-size: 16px;
+            color: #333;
+            transition: border-color 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='5'%3E%3Cpath fill='%23007BFF' d='M0 0l5 5 5-5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+        }
+
+        .styled-select:focus {
+            outline: none;
+            border-color: #0056b3;
+        }
+
     </style>
 </head>
 <body>
@@ -80,11 +117,20 @@
         <h1>Libros Ordenados con {{ method|capfirst }} Sort</h1>
 
         {% if image_url %}
-            <h2>Distribución de Libros por Año</h2>
+            <h2>Distribución de Libros</h2>
             <img src="{{ image_url }}" alt="Gráfica de libros ordenados">
         {% endif %}
 
         <h2>Lista de Libros</h2>
+        <div class="select-wrapper">
+            <label for="tipo">Ordenar por:</label>
+            <select name="tipo" id="tipo" class="styled-select">
+                <option value="0">Título</option>
+                <option value="1">Autor</option>
+                <option value="2">Año</option>
+            </select>
+        </div>
+
         <div class="table-container">
             <table>
                 <thead>
@@ -106,8 +152,20 @@
             </table>
         </div>
 
-        <a href="/" class="btn">Volver al inicio</a>
+        <a href="/ordenamiento/" class="btn">Volver al inicio</a>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        const tipo = "{{ tipo }}"; 
+        const select = document.getElementById('tipo');
+        select.value = tipo; 
 
+        select.addEventListener('change', function () {
+            const tipoSeleccionado = this.value;
+            const method = "{{ method }}";
+            window.location.href = `/ordenamiento/sort/${method}/${tipoSeleccionado}`;
+        });
+    });
+    </script>
 </body>
 </html>

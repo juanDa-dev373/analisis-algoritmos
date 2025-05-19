@@ -19,16 +19,25 @@ class BibFileProcessor:
         return pd.DataFrame(records)
 
     def _transform_entry(self, entry: Dict[str, str]) -> Dict[str, str]:
+        entry_type = str(entry.get('ENTRYTYPE', 'article')).strip().lower()
         year_value = re.sub(r'\D+$', '', entry.get('year', 'Sin Valor'))
         title, author = entry.get('title', 'Sin Valor'), entry.get('author', 'Sin Valor').split(',')[0]
         abstract = entry.get('abstract', 'Sin Valor')
+        journal = entry.get('journal', 'Sin valor')
+        publisher = entry.get('publisher', 'Sin valor')
         
         return {
-            'Autor': entry.get('author', 'Sin Valor'), 'Title': title, 'Year': year_value,
-            'Volume': entry.get('volume', 'Sin Valor'), 'Issue': entry.get('number', 'Sin Valor'),
+            'Type': entry_type,
+            'Autor': entry.get('author', 'Sin Valor'), 
+            'Title': title, 
+            'Year': year_value,
+            'Volume': entry.get('volume', 'Sin Valor'), 
+            'Issue': entry.get('number', 'Sin Valor'),
             'Start Page': entry.get('pages', 'Sin Valor').split('-')[0] if 'pages' in entry else 'Sin Valor',
             'End Page': entry.get('pages', 'Sin Valor').split('-')[1] if 'pages' in entry and '-' in entry['pages'] else 'Sin Valor',
-            'Abstract': abstract, 'DOI': entry.get('doi', 'Sin Valor'), 'Database': self.source
+            'Abstract': abstract, 'DOI': entry.get('doi', 'Sin Valor'), 'Database': self.source,
+            'Journal': journal, 
+            'Publisher': publisher,
         }
 
 class AbstractFetcher:
