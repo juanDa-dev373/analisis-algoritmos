@@ -29,7 +29,7 @@
     <script>
     setTimeout(() => {
         {% if method %}
-            window.location.href = "{% url url method tipo %}";
+            window.location.href = "{% url url method 0 %}";
         {% else %}
             window.location.href = "{% url url %}";
         {% endif %}
