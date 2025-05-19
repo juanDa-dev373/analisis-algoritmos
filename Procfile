@@ -1,0 +1,1 @@
+web: gunicorn mi_proyecto_django_analisis.wsgi

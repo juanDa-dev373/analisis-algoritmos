@@ -38,6 +38,7 @@ def aplicar_agglomerative(tfidf_matrix, df: pd.DataFrame, n_clusters: int = 5) -
     model = AgglomerativeClustering(n_clusters=n_clusters, affinity='euclidean', linkage='ward')
     labels = model.fit_predict(tfidf_matrix.toarray())
     df['Cluster'] = labels
+    
     return df
 
 
