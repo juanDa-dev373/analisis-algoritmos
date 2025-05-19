@@ -2,8 +2,11 @@ import os
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import networkx as nx
-import community as community_louvain
 from colorama import Fore
+from networkx.algorithms.community import greedy_modularity_communities
+import matplotlib.pyplot as plt
+import networkx as nx
+import os
 
 class Visualization:
     def generate_wordclouds(self, frecuencias_categoria, output_path):
@@ -73,25 +76,38 @@ class Visualization:
         if not graph:
             print("No se generó ningún grafo de concurrencia.")
             return
-        print("se inicio el dibujo del grafo...")
-        os.makedirs(output_path + "/graph", exist_ok=True)
-        partition = community_louvain.best_partition(graph)
+
+        print("se inició el dibujo del grafo...")
+        os.makedirs(os.path.join(output_path, "graph"), exist_ok=True)
+
+        # Reemplazo de Louvain: greedy_modularity_communities
+        communities = list(greedy_modularity_communities(graph))
+
+        # Crear partición tipo dict: {nodo: id_comunidad}
+        partition = {}
+        for i, community in enumerate(communities):
+            for node in community:
+                partition[node] = i
+
         pos = nx.spring_layout(graph, k=9, seed=42)
         cmap = plt.get_cmap('tab20')
+
         node_color_dict = {node: cmap(partition[node]) for node in graph.nodes()}
         node_colors = [node_color_dict[node] for node in graph.nodes()]
         node_sizes = [300 + 40 * graph.degree(node) for node in graph.nodes()]
-        edge_widths = [0.5 + graph[u][v]['weight'] * 0.2 for u, v in graph.edges()]
+        edge_widths = [0.5 + graph[u][v].get('weight', 1) * 0.2 for u, v in graph.edges()]
         edge_colors = [node_color_dict[u] for u, v in graph.edges()]
 
         plt.figure(figsize=(22, 18))
         nx.draw_networkx_nodes(graph, pos, node_size=node_sizes, node_color=node_colors, alpha=0.85, edgecolors='black')
         nx.draw_networkx_edges(graph, pos, width=edge_widths, edge_color=edge_colors, alpha=0.4)
         nx.draw_networkx_labels(graph, pos, font_size=10)
+
         plt.title("Grafo", fontsize=18)
         plt.axis('off')
         plt.tight_layout()
-        output_file = os.path.join(output_path + "/graph", "co_word_graph.png")
+
+        output_file = os.path.join(output_path, "graph", "co_word_graph.png")
         plt.savefig(output_file, dpi=300)
         plt.close()
-        print("se creo correctamente el grafo :)")
+        print("se creó correctamente el grafo :)")

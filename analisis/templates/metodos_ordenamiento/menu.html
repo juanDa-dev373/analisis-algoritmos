@@ -60,17 +60,32 @@
             font-size: 0.95em;
             color: #7f8c8d;
         }
+        .back-button {
+            display: inline-block;
+            padding: 12px 18px;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <h1>Métodos de Ordenamiento</h1>
     <div class="container">
         {% for metodo in metodos %}
-            <a href="{% url 'loading_screen' metodo.slug %}" class="card">
+        <a href="{% url 'loading_screen' 'sort_books' metodo.slug %}" class="card">
                 <div class="metodo-nombre">{{ metodo.nombre }}</div>
                 <div class="complejidad">Complejidad: {{ metodo.complejidad }}</div>
             </a>
         {% endfor %}
     </div>
+    <a href="{% url 'menu_general' %}" class="back-button">Volver al Menú Principal</a>
+
 </body>
 </html>

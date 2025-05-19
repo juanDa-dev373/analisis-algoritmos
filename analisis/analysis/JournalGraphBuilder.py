@@ -25,6 +25,7 @@ class JournalGraphBuilder:
         dendogram = DrawDendogram()
         dendogram._generate_dendrograms(self.df, self.output_path, self.categorias)
 
+
     def drawSaveGraph(self):
         graph = GraphAnalysis()
         abstracts = self.df['Abstract']
