@@ -152,16 +152,16 @@ def generar_grafo(request):
 def mostrar_nube_palabras(request):
     # Implementación de la vista para generar nube de palabras
     image_urls = [
-        '/static/assets/statisticS/word-clouds/wordcloud_global.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Actitudes.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Diseño de investigación.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Estrategia.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Habilidades.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Herramienta de evaluación.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Herramienta.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Medio.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Nivel de escolaridad.png',
-        '/static/assets/statisticS/word-clouds/wordcloud_Propiedades psicométricas.png'
+        '/static/assets/statistics/word-clouds/wordcloud_global.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Actitudes.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Diseño de investigación.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Estrategia.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Habilidades.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Herramienta de evaluación.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Herramienta.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Medio.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Nivel de escolaridad.png',
+        '/static/assets/statistics/word-clouds/wordcloud_Propiedades psicométricas.png'
     ]
     return render(request, 'analysis_methods/generar_nube_palabras.html', {
         'image_url_list': image_urls,
